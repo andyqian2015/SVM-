@@ -13,7 +13,7 @@ int SVM_Classfy(const std::vector< std::vector<float> > &vvFeature, int lables[]
      }
       
      std::cout << nTrainSize << " " << nFeatureSize << std::endl;
-     /*     
+          
      cv::Mat lablesMat(nTrainSize, 1, CV_32SC1, lables);
      float trainingData[nTrainSize][nFeatureSize] = {0};
      for(int i = 0 ; i < nTrainSize;++i)
@@ -24,15 +24,15 @@ int SVM_Classfy(const std::vector< std::vector<float> > &vvFeature, int lables[]
        }
      }
      Mat trainingDataMat(nTrainSize, nFeatureSize, CV_32FC1, trainingData);
-     */
+     
      Ptr<SVM> model = SVM::create();
      model->setType(SVM::C_SVC);
      model->setKernel(SVM::LINEAR);
 
-//     Ptr<TrainData> data = TrainData::create(trainingDataMat, ROW_SAMPLE, lablesMat);   //训练数据
-//     model->train(data);
+     Ptr<TrainData> data = TrainData::create(trainingDataMat, ROW_SAMPLE, lablesMat);   //训练数据
+     model->train(data);
 
-//     model->save("car.xml");
+     model->save("car.xml");
 
      Ptr<ml::SVM>svm = ml::SVM::load("car.xml");
      float test[nFeatureSize] = {0};
@@ -404,7 +404,7 @@ int main()
   int nCnt = 3791;
   int w = 512, h = 512;
   getData(filesrcDir, pathsrc,w, h,vvFeature);
-//  getData(filesoftDir, pathsoft,w, h, vvFeature);
+  getData(filesoftDir, pathsoft,w, h, vvFeature);
 
   // 数组的初始化，是如何的
   int lables[nCnt*2] = {0};
