@@ -33,15 +33,10 @@ int SVM_Classfy(const std::vector< std::vector<float> > &vvFeature, int lables[]
      model->train(data);
 
      model->save("car.xml");
+     
 
      Ptr<ml::SVM>svm = ml::SVM::load("car.xml");
-     float test[nFeatureSize] = {0};
-
-     for(int i = 0 ; i < nFeatureSize;++i)
-     {
-//       std::cout << vvFeature[34][i] << std::endl;
-     }
-     
+     float test[nFeatureSize] = {0}; 
      int nPosCnt = 0;
      int nNegCnt = 0;
      for(int i = 0 ; i < vvFeature.size(); ++i)
@@ -143,18 +138,25 @@ void GetDataFromFile(const char* fileDir, const std::string path,  std::vector<s
 
 void GetDataFromFile(std::string fileDir, cv::Mat &m)
 {
-   cv::Mat matsrc = cv::imread(fileDir, cv::IMREAD_GRAYSCALE);
-   cv::resize(matsrc, m, cv::Size(512, 512));
+   cv::Mat matsrc = cv::imread(fileDir, IMREAD_GRAYSCALE);
+   cv::Mat dstMat;
+   std::cout << matsrc.type() << std::endl;
+   std::cout << matsrc.dims << std::endl;
+   if (matsrc.dims > 2)
+       cv::Mat matsrc = cv::imread(fileDir, IMREAD_GRAYSCALE);
+   cv::resize(matsrc, dstMat, cv::Size(512, 512));
    int nRows = m.rows;
    int nCols = m.cols;
+   
 
    double maxV =0,minV = 0;
    Point maxP,minP;
-   minMaxLoc(m,&minV,&maxV,&minP,&maxP);
+   minMaxLoc(dstMat,&minV,&maxV,&minP,&maxP);
+   std::cout << maxV << " " << minV << std::endl;
    for (int i = 0 ; i < nRows; ++i)
    {
      for(int j = 0; j < nCols;++j)
-       m.at<uchar>(i,j) = (uchar)((unsigned short)m.at<uchar>(i,j)-minV)/(maxV - minV);
+       m.at<uchar>(i,j) = (uchar)((unsigned short)((dstMat.at<unsigned short>(i,j)-minV)/(maxV - minV)));
    }
 }
 
@@ -170,8 +172,9 @@ void getData(const char* fileDir, const std::string path, const int w, const int
    std::vector< std::string> vfileDir(0);
    GetDataFromFile(fileDir, path, vfileDir); 
    cv::Mat mat(w,h,CV_8UC1);
-   while(nIndex < vfileDir.size())
+   while(nIndex < 2)
    {
+       std::cout << vfileDir[nIndex] << std::endl;
        if (nIndex >= 0)
        {
           const char* fileDir = &vfileDir[nIndex][0];
@@ -397,14 +400,18 @@ void Test_drawImg(const cv::Mat c)
 int main()
 { 
   std::string pathsrc = "/data/TB/TBdata/training/ori/png/";
-  std::string pathsoft = "/data/qian/SVMSoftData/";
+//  std::string pathsoft = "/data/qian/TB_lyzpng/train/image/soft1/";
+//  std::string pathsoft = "/data/qian/SVMSoftData/";
+//  const char* filesrcDir = "/home/dongdong/qian/srctrainimg.txt";
+//  const char* filesoftDir = "/home/dongdong/qian/softtrainimg.txt";	
+  
   const char* filesrcDir = "/home/dongdong/qian/srctestimg.txt";
-  const char* filesoftDir = "/home/dongdong/qian/softtestimg.txt";	
+//  const char* filesoftDir = "/home/dongdong/qian/softtestimg.txt";	
   std::vector< std::vector<float> > vvFeature(0);
-  int nCnt = 3791;
+  int nCnt = 800;
   int w = 512, h = 512;
   getData(filesrcDir, pathsrc,w, h,vvFeature);
-  getData(filesoftDir, pathsoft,w, h, vvFeature);
+//  getData(filesoftDir, pathsoft,w, h, vvFeature);
 
   // 数组的初始化，是如何的
   int lables[nCnt*2] = {0};
